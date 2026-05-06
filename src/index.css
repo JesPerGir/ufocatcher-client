@@ -1,0 +1,20 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  /* Carga la paleta de colores de la Guía de Estilo */
+  --color-primario: #68299E;
+  --color-secundario: #F9A35A;
+  --color-fondo: #F5F6FA;
+  --color-texto: #2D3436;
+  
+  /* Carga la fuente */
+  --font-sans: 'Open Sans', sans-serif;
+}
+
+/* Aplica el fondo claro y el color de texto oscuro a toda la web por defecto */
+body {
+  background-color: var(--color-fondo);
+  color: var(--color-texto);
+  font-family: var(--font-sans);
+}
