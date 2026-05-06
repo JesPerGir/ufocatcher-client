@@ -85,93 +85,97 @@ const exportarPDF = async () => {
           </div>
         ) : (
           <>
-            <div ref={tablaRef} className="bg-[#1D0C2E] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 border-primario/30">
+            {/* 1. Contenedor principal con sombra y bordes. Le ponemos overflow-hidden para que la tabla respete las curvas de las esquinas */}
+            <div ref={tablaRef} className="bg-[#1D0C2E] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] border-2 border-primario/30 overflow-hidden w-full">
               
-              <table className="w-full text-left border-separate" style={{ borderSpacing: 0 }}>
-                <thead>
-                  <tr className="bg-primario text-white uppercase tracking-[0.2em] text-xs">
-                    <th className="p-6 text-center w-24 rounded-tl-[1.3rem]">Pos</th>
-                    <th className="p-6 text-left">Piloto</th>
-                    <th className="p-6 text-center">Puntuación</th>
-                    <th className="p-6 hidden md:table-cell text-center">Misión</th>
-                    <th className="p-6 text-center rounded-tr-[1.3rem]">Fecha</th>
-                  </tr>
-                </thead>
-                <tbody className="text-gray-300">
-                  {puntuaciones.map((p, index) => {
-                    
-                    const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', {
-                      day: '2-digit',
-                      month: '2-digit',
-                      year: 'numeric'
-                    }).replace(/\//g, '-');
-                    
-                    // Asegura que la última fila redondee la parte inferior
-                    const isLast = index === puntuaciones.length - 1;
-                    
-                    return (
-                      <tr 
-                        key={p._id} 
-                        className={`hover:bg-white/[0.03] transition-all duration-300 group ${!isLast ? 'border-b border-white/5' : ''}`}
-                      >
-                        <td className={`p-6 text-center ${!isLast ? 'border-b border-white/5' : 'rounded-bl-[1.3rem]'}`}>
-                          {index === 0 ? (
-                            <span className="text-3xl drop-shadow-[0_0_15px_rgba(249,163,90,0.8)]">🥇</span>
-                          ) : index === 1 ? (
-                            <span className="text-3xl drop-shadow-[0_0_15px_rgba(156,163,175,0.5)]">🥈</span>
-                          ) : index === 2 ? (
-                            <span className="text-3xl drop-shadow-[0_0_15px_rgba(205,127,50,0.5)]">🥉</span>
-                          ) : (
-                            <span className="text-secundario font-black font-mono text-xl">
-                              {index + 1 < 10 ? `0${index + 1}` : index + 1}
+              {/* 2. Contenedor interno que SÓLO se encarga del scroll horizontal en móviles */}
+              <div className="w-full overflow-x-auto">
+                
+                <table className="w-full min-w-[550px] text-left border-separate" style={{ borderSpacing: 0 }}>
+                  <thead>
+                    <tr className="bg-primario text-white uppercase tracking-[0.1em] md:tracking-[0.2em] text-[10px] md:text-xs">
+                      <th className="px-2 py-4 md:p-6 text-center w-12 md:w-24">Pos</th>
+                      <th className="px-3 py-4 md:p-6 text-left">Piloto</th>
+                      <th className="px-3 py-4 md:p-6 text-center">Puntuación</th>
+                      <th className="px-3 py-4 md:p-6 hidden md:table-cell text-center">Misión</th>
+                      <th className="px-3 py-4 md:p-6 text-center">Fecha</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-gray-300">
+                    {puntuaciones.map((p, index) => {
+                      
+                      const fechaFormateada = new Date(p.fecha).toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                      }).replace(/\//g, '-');
+                      
+                      const isLast = index === puntuaciones.length - 1;
+                      
+                      return (
+                        <tr 
+                          key={p._id} 
+                          className={`hover:bg-white/[0.03] transition-all duration-300 group ${!isLast ? 'border-b border-white/5' : ''}`}
+                        >
+                          <td className={`px-2 py-4 md:p-6 text-center ${!isLast ? 'border-b border-white/5' : ''}`}>
+                            {index === 0 ? (
+                              <span className="text-2xl md:text-3xl drop-shadow-[0_0_15px_rgba(249,163,90,0.8)]">🥇</span>
+                            ) : index === 1 ? (
+                              <span className="text-2xl md:text-3xl drop-shadow-[0_0_15px_rgba(156,163,175,0.5)]">🥈</span>
+                            ) : index === 2 ? (
+                              <span className="text-2xl md:text-3xl drop-shadow-[0_0_15px_rgba(205,127,50,0.5)]">🥉</span>
+                            ) : (
+                              <span className="text-secundario font-black font-mono text-lg md:text-xl">
+                                {index + 1 < 10 ? `0${index + 1}` : index + 1}
+                              </span>
+                            )}
+                          </td>
+                          
+                          <td className={`px-3 py-4 md:p-6 text-left ${!isLast ? 'border-b border-white/5' : ''}`}>
+                            <div className="flex items-center gap-2 md:gap-3">
+                              <div className={`h-1.5 w-1.5 md:h-2 md:w-2 rounded-full ${index < 3 ? 'bg-secundario animate-ping' : 'bg-primario/50'}`}></div>
+                              <span className={`text-base md:text-xl font-bold tracking-tight ${index < 3 ? 'text-white' : 'text-gray-400'}`}>
+                                {p.usuario}
+                              </span>
+                            </div>
+                          </td>
+                          
+                          <td className={`px-3 py-4 md:p-6 text-center ${!isLast ? 'border-b border-white/5' : ''}`}>
+                            <span className="font-mono text-lg md:text-2xl font-black text-secundario tracking-tighter drop-shadow-[0_0_8px_rgba(249,163,90,0.4)]">
+                              {p.puntos.toLocaleString()}
                             </span>
-                          )}
-                        </td>
-                        
-                        <td className={`p-6 text-left ${!isLast ? 'border-b border-white/5' : ''}`}>
-                          <div className="flex items-center gap-3">
-                            <div className={`h-2 w-2 rounded-full ${index < 3 ? 'bg-secundario animate-ping' : 'bg-primario/50'}`}></div>
-                            <span className={`text-xl font-bold tracking-tight ${index < 3 ? 'text-white' : 'text-gray-400'}`}>
-                              {p.usuario}
-                            </span>
-                          </div>
-                        </td>
-                        
-                        <td className={`p-6 text-center ${!isLast ? 'border-b border-white/5' : ''}`}>
-                          <span className="font-mono text-2xl font-black text-secundario tracking-tighter drop-shadow-[0_0_8px_rgba(249,163,90,0.4)]">
-                            {p.puntos.toLocaleString()}
-                          </span>
-                          <span className="ml-2 text-[10px] text-secundario/50 font-bold">PTS</span>
-                        </td>
+                            <span className="ml-1 md:ml-2 text-[8px] md:text-[10px] text-secundario/50 font-bold">PTS</span>
+                          </td>
 
-                        <td className={`p-6 hidden md:table-cell text-center ${!isLast ? 'border-b border-white/5' : ''}`}>
-                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primario/10 border border-primario/30">
-                            <div className="w-1.5 h-1.5 rounded-full bg-primario/80"></div>
-                            <span className="text-xs font-mono text-gray-300 tracking-widest uppercase">
-                              ID-{p._id.substring(p._id.length - 4)}
-                            </span>
-                          </div>
-                        </td>
-                        
-                        <td className={`p-6 text-center ${!isLast ? 'border-b border-white/5' : 'rounded-br-[1.3rem]'}`}>
-                          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-secundario/10 border border-secundario/30">
-                            <div className="w-1.5 h-1.5 rounded-full bg-secundario/80"></div>
-                            <span className="text-xs font-mono text-gray-300 tracking-widest">
-                              {fechaFormateada}
-                            </span>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+                          <td className={`px-3 py-4 md:p-6 hidden md:table-cell text-center ${!isLast ? 'border-b border-white/5' : ''}`}>
+                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-primario/10 border border-primario/30">
+                              <div className="w-1.5 h-1.5 rounded-full bg-primario/80"></div>
+                              <span className="text-xs font-mono text-gray-300 tracking-widest uppercase">
+                                ID-{p._id.substring(p._id.length - 4)}
+                              </span>
+                            </div>
+                          </td>
+                          
+                          <td className={`px-3 py-4 md:p-6 text-center ${!isLast ? 'border-b border-white/5' : ''}`}>
+                            <div className="inline-flex items-center gap-1 md:gap-2 px-2 md:px-3 py-1 md:py-1.5 rounded-md bg-secundario/10 border border-secundario/30">
+                              <div className="hidden md:block w-1.5 h-1.5 rounded-full bg-secundario/80"></div>
+                              <span className="text-[10px] md:text-xs font-mono text-gray-300 tracking-widest">
+                                {fechaFormateada}
+                              </span>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
 
-              {puntuaciones.length === 0 && (
-                <div className="text-center p-20 text-primario/50 font-bold tracking-widest italic">
-                  {">"} NO SE HAN DETECTADO SEÑALES DE VIDA EN EL RANKING {"<"}
-                </div>
-              )}
+                {puntuaciones.length === 0 && (
+                  <div className="text-center p-10 md:p-20 text-primario/50 font-bold tracking-widest italic">
+                    {">"} NO SE HAN DETECTADO SEÑALES DE VIDA EN EL RANKING {"<"}
+                  </div>
+                )}
+              </div>
             </div>
 
             <div className="mt-8 flex flex-col md:flex-row justify-between items-center gap-6">
