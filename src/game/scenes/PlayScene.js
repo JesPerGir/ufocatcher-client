@@ -10,10 +10,41 @@ export default class PlayScene extends Phaser.Scene {
 
     create() {
         this.input.setDefaultCursor('none');
-        const anchoPantalla = this.scale.width;
-        const altoPantalla = this.scale.height;
 
-        this.fondo = this.add.tileSprite(0, 0, anchoPantalla, altoPantalla, 'fondo').setOrigin(0, 0);
+        // =========================================================
+        // --- 1. FUNCIÓN PARA CALCULAR ZOOM Y ÁREA LÓGICA ---
+        // =========================================================
+        const actualizarDimensiones = (width, height) => {
+            const baseWidth = 1920;
+            const baseHeight = 1080;
+            const scaleX = width / baseWidth;
+            const scaleY = height / baseHeight;
+            const zoomPercent = Math.max(scaleX, scaleY);
+
+            // Aplicamos el zoom a la cámara
+            this.cameras.main.setZoom(zoomPercent);
+
+            // LA CLAVE: Calculamos cuánto mide el mundo real tras el zoom
+            // Esto es lo que "crea o destruye" el área según el Aspect Ratio
+            this.logicalWidth = width / zoomPercent;
+            this.logicalHeight = height / zoomPercent;
+
+            // Centramos la cámara
+            this.cameras.main.centerOn(this.logicalWidth / 2, this.logicalHeight / 2);
+
+            // Actualizamos los límites, fondo y UI con el TAMAÑO LÓGICO
+            this.physics.world.setBounds(0, 0, this.logicalWidth, this.logicalHeight);
+            if (this.fondo) this.fondo.setSize(this.logicalWidth, this.logicalHeight);
+            if (this.ui) this.ui.reposicionarHUD(this.logicalWidth);
+        };
+
+        // Inicializamos las dimensiones lógicas por primera vez
+        actualizarDimensiones(this.scale.width, this.scale.height);
+
+        // =========================================================
+        // --- 2. INICIALIZACIÓN DE ENTIDADES (Usando área lógica) ---
+        // =========================================================
+        this.fondo = this.add.tileSprite(0, 0, this.logicalWidth, this.logicalHeight, 'fondo').setOrigin(0, 0);
 
         this.bgm = this.sound.add('musicaFondo', { loop: true, volume: 0.4 });
         this.bgm.play();
@@ -23,10 +54,10 @@ export default class PlayScene extends Phaser.Scene {
         graphics.fillCircle(4, 4, 4);
         graphics.generateTexture('particula', 8, 8);
 
-        // INICIALIZA ENTIDADES
-        this.player = new Player(this, anchoPantalla / 2, altoPantalla / 2);
+        // Instanciamos en el centro del mundo lógico
+        this.player = new Player(this, this.logicalWidth / 2, this.logicalHeight / 2);
         this.spawner = new Spawner(this);
-        this.ui = new UIManager(this); // INICIALIZA LA UI
+        this.ui = new UIManager(this);
 
         this.explosionOrbes = this.add.particles(0, 0, 'particula', {
             speed: { min: 80, max: 200 },
@@ -53,34 +84,33 @@ export default class PlayScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, this.spawner.recompensas, this.recogerRecompensa, null, this);
         this.colisionEnemigos = this.physics.add.collider(this.player, this.spawner.enemigos, this.chocarEnemigo, null, this);
 
-        // Delega la creación visual del marcador
         this.ui.crearHUD();
+        this.ui.reposicionarHUD(this.logicalWidth);
 
+        // =========================================================
+        // --- 3. EVENTO RESIZE DINÁMICO ---
+        // =========================================================
         this.scale.on('resize', (gameSize) => {
-            this.physics.world.setBounds(0, 0, gameSize.width, gameSize.height);
-            this.fondo.setSize(gameSize.width, gameSize.height);
-            this.ui.reposicionarHUD(gameSize.width); // Delega el reposicionamiento
+            actualizarDimensiones(gameSize.width, gameSize.height);
         });
     }
 
     update(time, delta) {
         if (this.physics.world.isPaused) return;
 
-        // CONTROL DE MUERTE CINEMÁTICA
+        // CONTROL DE MUERTE CINEMÁTICA (Actualizado a lógica)
         if (this.player.isDead) {
             const margen = 150;
-            if (this.player.x < -margen || this.player.x > this.scale.width + margen ||
-                this.player.y < -margen || this.player.y > this.scale.height + margen) {
+            // Verificamos si sale de los nuevos límites lógicos
+            if (this.player.x < -margen || this.player.x > this.logicalWidth + margen ||
+                this.player.y < -margen || this.player.y > this.logicalHeight + margen) {
 
-                // Para la escena y el audio aquí
                 this.physics.pause();
                 this.timerEvent.remove();
                 if (this.bgm) {
                     this.bgm.setDetune(-800);
                     this.bgm.setVolume(0.15);
                 }
-
-                // Llama a la UI para que pinte el menú final
                 this.ui.mostrarMenuGameOver(this.score, this.bgm);
             }
             return;

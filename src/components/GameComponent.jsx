@@ -51,7 +51,11 @@ const GameComponent = () => {
     }, [token, navigate]);
 
     return (
-        <div ref={gameRef} className="w-full h-full" />
+        <div 
+        ref={gameRef} 
+        // Le aplicamos un fondo morado oscuro espacial o tu imagen de fondo
+        className="w-full h-full bg-[#110524] bg-[url('/sprites/fondo.png')] bg-repeat bg-center" 
+    />
     );
 };
 

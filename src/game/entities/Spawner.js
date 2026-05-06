@@ -109,8 +109,9 @@ export default class Spawner {
     }
 
     spawnAleatorio(grupo, key, escala, velocidadBase, dificultad) {
-        const ancho = this.scene.scale.width;
-        const alto = this.scene.scale.height;
+        const ancho = this.scene.logicalWidth;
+        const alto = this.scene.logicalHeight;
+
         const borde = Phaser.Math.Between(0, 3);
         const margen = 100;
 
@@ -133,7 +134,11 @@ export default class Spawner {
     }
 
     limpiarObjetos(grupo) {
-        const ancho = this.scene.scale.width, alto = this.scene.scale.height, limite = 200;
+        // CAMBIO AQUÍ: Usamos las dimensiones lógicas para saber cuándo borrarlos
+        const ancho = this.scene.logicalWidth;
+        const alto = this.scene.logicalHeight;
+        const limite = 200;
+
         grupo.getChildren().forEach(objeto => {
             if (objeto.x < -limite || objeto.x > ancho + limite || objeto.y < -limite || objeto.y > alto + limite) {
                 objeto.destroy();

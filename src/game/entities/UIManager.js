@@ -44,17 +44,21 @@ export default class UIManager {
 
 
     // Dibuja el menú final y gestiona los clicks de los botones
+    // Dibuja el menú final y gestiona los clicks de los botones
     mostrarMenuGameOver(score, bgm) {
         // Avisa a React de que el juego ha terminado (y envia la puntuación)
         EventBus.emit('game-over', score);
 
-        const ancho = this.scene.scale.width;
-        const alto = this.scene.scale.height;
+        // USAMOS LAS DIMENSIONES LÓGICAS EN LUGAR DE LAS FÍSICAS
+        const ancho = this.scene.logicalWidth;
+        const alto = this.scene.logicalHeight;
         const centroX = ancho / 2;
         const centroY = alto / 2;
 
         // Fondo oscuro semitransparente
-        this.scene.add.graphics().fillStyle(0x000000, 0.8).fillRect(0, 0, ancho, alto).setDepth(200);
+        // Le damos un margen extra (-100 en posición y +200 en tamaño) 
+        // para garantizar que cubra los bordes incluso si hay decimales en el zoom
+        this.scene.add.graphics().fillStyle(0x000000, 0.85).fillRect(-100, -100, ancho + 200, alto + 200).setDepth(200);
 
         // Panel principal
         const panel = this.scene.add.graphics().fillStyle(0x1D0C2E, 1).fillRoundedRect(centroX - 250, centroY - 150, 500, 300, 20);
