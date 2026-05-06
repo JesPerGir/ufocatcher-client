@@ -28,7 +28,7 @@ const GameComponent = () => {
         const handleGameOver = async (puntuacionFinal) => {
             if (!token) return;
             try {
-                await fetch('http://localhost:3000/api/puntuaciones', {
+                await fetch(`${import.meta.env.VITE_API_URL}/api/puntuaciones`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
