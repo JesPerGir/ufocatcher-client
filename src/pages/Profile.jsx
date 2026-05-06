@@ -27,7 +27,7 @@ export default function Profile() {
   useEffect(() => {
     const fetchHistorial = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/puntuaciones/historial', {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/puntuaciones/historial`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (response.ok) {

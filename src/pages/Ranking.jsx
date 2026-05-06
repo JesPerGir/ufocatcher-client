@@ -12,7 +12,7 @@ export default function Ranking() {
   useEffect(() => {
     const obtenerRanking = async () => {
       try {
-        const respuesta = await fetch('http://localhost:3000/api/puntuaciones/ranking');
+        const respuesta = await fetch(`${import.meta.env.VITE_API_URL}/api/puntuaciones/ranking`);
         const datos = await respuesta.json();
         setPuntuaciones(datos);
         setCargando(false);
